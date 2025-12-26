@@ -60,25 +60,25 @@ python generate_volume.py
 
 ## Expected Costs
 
-- **Trading fees**: ~$100-200 for entire $100k volume
-- **Slippage**: Minimal with small positions
-- **Total cost**: ~0.1-0.2% of volume generated
+- **Trading fees**: ~$100-200 for entire $100k volume  
+- **Slippage**: Minimal with small positions  
+- **Total cost**: ~0.1-0.2% of volume generated  
 
 ## Safety
 
-✅ **Locked requirements.txt** - fixed dependencies to reduce attacks
-✅ **Testnet by default** - no real money at risk
-✅ **Small positions** - limits exposure
-✅ **Immediate close** - minimal market risk
-✅ **Progress tracking** - see volume in real-time
+✅ **Locked requirements.txt** - fixed dependencies to reduce attacks  
+✅ **Testnet by default** - no real money at risk  
+✅ **Small positions** - limits exposure  
+✅ **Immediate close** - minimal market risk  
+✅ **Progress tracking** - see volume in real-time  
 
 Press `Ctrl+C` to stop anytime.
 
 ## Troubleshooting
 
-**"No accountValue" error**: Fund your testnet wallet first
-**Rate limiting**: Increase `DELAY_BETWEEN_TRADES` to 1.0 if needed
-**Trade failures**: Reduce `POSITION_SIZE` or check balance
+**"No accountValue" error**: Fund your testnet wallet first  
+**Rate limiting**: Increase `DELAY_BETWEEN_TRADES` to 1.0 if needed  
+**Trade failures**: Reduce `POSITION_SIZE` or check balance  
 
 ## After Completion
 
