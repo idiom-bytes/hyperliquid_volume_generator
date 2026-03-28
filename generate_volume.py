@@ -19,16 +19,16 @@ from hyperliquid.utils import constants
 def main():
     # ==================== CONFIGURATION ====================
     # Network selection
-    USE_MAINNET = False  # Set to True for mainnet, False for testnet
+    USE_MAINNET = True  # Set to True for mainnet, False for testnet
 
     # Volume targets
     STARTING_VOLUME = 0  # Current volume on account (e.g., 30000 if you already have 30k)
     TARGET_VOLUME = 100_000  # $100k USD target volume
 
     # Trading parameters
-    POSITION_SIZE = 0.1  # Small position size in ETH (adjust based on your needs)
+    POSITION_SIZE = 1  # Small position size in ETH (adjust based on your needs)
     COIN = "ETH"  # Trading pair
-    LEVERAGE = 10  # High leverage to maximize volume per trade
+    LEVERAGE = 3  # High leverage to maximize volume per trade
     DELAY_BETWEEN_TRADES = 0.25  # Seconds to wait between trades (adjust for rate limits)
     # =======================================================
 
@@ -202,7 +202,10 @@ def main():
 
     print(f"\nInitial Balance: ${initial_balance:.2f}")
     print(f"Final Balance: ${final_balance:.2f}")
-    print(f"PnL: ${pnl:.2f} ({(pnl/initial_balance)*100:.2f}%)")
+    if initial_balance > 0:
+        print(f"PnL: ${pnl:.2f} ({(pnl/initial_balance)*100:.2f}%)")
+    else:
+        print(f"PnL: ${pnl:.2f}")
     print("=" * 60)
 
 
