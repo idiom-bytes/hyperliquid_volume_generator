@@ -7,45 +7,47 @@ from eth_account.signers.local import LocalAccount
 from hyperliquid.exchange import Exchange
 from hyperliquid.info import Info
 
-load_dotenv()
+# override=False means exported shell vars take precedence over .env
+load_dotenv(override=False)
 
 
-def setup(base_url=None, skip_ws=False):
+def setup(base_url=None, skip_ws=False, use_target=None):
     secret_key = os.getenv("SECRET_KEY")
     if not secret_key:
-        raise Exception("SECRET_KEY not found in environment. Please set it in your .env file.")
+        raise Exception("SECRET_KEY not set. Export it or add it to .env.")
 
     account: LocalAccount = eth_account.Account.from_key(secret_key)
     print("Agent wallet address:", account.address)
 
-    target_vault = os.getenv("TARGET_VAULT")
-    target_account = os.getenv("TARGET_ACCOUNT")
-
-    if target_vault and target_account:
-        raise Exception("Set only one of TARGET_VAULT or TARGET_ACCOUNT, not both.")
-
     info = Info(base_url, skip_ws)
 
-    if target_vault:
-        print(f"Trading on behalf of vault: {target_vault}")
-        exchange = Exchange(account, base_url, vault_address=target_vault)
-        trading_address = target_vault
-    elif target_account:
-        print(f"Trading on behalf of account: {target_account}")
-        exchange = Exchange(account, base_url, account_address=target_account)
-        trading_address = target_account
+    if use_target == "vault":
+        address = os.getenv("TARGET_VAULT")
+        if not address:
+            raise Exception("--target vault requires TARGET_VAULT to be set.")
+        print(f"Trading on behalf of vault: {address}")
+        exchange = Exchange(account, base_url, vault_address=address)
+    elif use_target == "account":
+        address = os.getenv("TARGET_ACCOUNT")
+        if not address:
+            raise Exception("--target account requires TARGET_ACCOUNT to be set.")
+        print(f"Trading on behalf of account: {address}")
+        # For API-agent authorized accounts, Hyperliquid maps agent→master on the
+        # backend. No vault_address in payload — just sign with the agent wallet.
+        exchange = Exchange(account, base_url)
     else:
-        exchange = Exchange(account, base_url, account_address=account.address)
-        trading_address = account.address
+        print("Trading as agent wallet directly.")
+        address = account.address
+        exchange = Exchange(account, base_url, account_address=address)
 
-    user_state = info.user_state(trading_address)
-    spot_user_state = info.spot_user_state(trading_address)
+    user_state = info.user_state(address)
+    spot_user_state = info.spot_user_state(address)
     margin_summary = user_state["marginSummary"]
 
     if float(margin_summary["accountValue"]) == 0 and len(spot_user_state["balances"]) == 0:
-        print("Not running the example because the target account has no equity.")
         url = info.base_url.split(".", 1)[1]
-        error_string = f"No accountValue:\nMake sure that {trading_address} has a balance on {url}."
-        raise Exception(error_string)
+        raise Exception(
+            f"No accountValue: make sure {address} has a balance on {url}."
+        )
 
-    return trading_address, info, exchange
+    return address, info, exchange

@@ -11,12 +11,21 @@ Strategy:
 - Minimize risk by using smaller position sizes, lower leverage, and quick execution
 """
 
+import argparse
 import time
 import example_utils
 from hyperliquid.utils import constants
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Generate Hyperliquid trading volume.")
+    parser.add_argument(
+        "--target",
+        choices=["account", "vault"],
+        default=None,
+        help="Trade on behalf of TARGET_ACCOUNT or TARGET_VAULT env var. Omit to trade as the private key directly.",
+    )
+    args = parser.parse_args()
     # ==================== CONFIGURATION ====================
     # Network selection
     USE_MAINNET = True  # Set to True for mainnet, False for testnet
@@ -54,7 +63,10 @@ def main():
 
     # Setup connection to selected network
     base_url = constants.MAINNET_API_URL if USE_MAINNET else constants.TESTNET_API_URL
-    address, info, exchange = example_utils.setup(base_url, skip_ws=True)
+    address, info, exchange = example_utils.setup(
+        base_url, skip_ws=True,
+        use_target=args.target,
+    )
 
     # Get initial account state
     user_state = info.user_state(address)
